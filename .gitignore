@@ -1,0 +1,5 @@
+*.log
+*.zip
+*.json
+mappings/
+.DS_Store

@@ -1,0 +1,93 @@
+name: 'iceDQ Generate Mapping'
+description: 'Auto-generate a mapping file from an iceDQ export bundle'
+author: 'iceDQ Integration Team'
+branding:
+  icon: 'git-merge'
+  color: 'blue'
+
+inputs:
+  icedq-url:
+    description: 'iceDQ instance base URL'
+    required: true
+  keycloak-url:
+    description: 'Keycloak token endpoint base'
+    required: true
+  client-id:
+    description: 'OAuth client ID'
+    required: true
+  client-secret:
+    description: 'OAuth client secret'
+    required: true
+  org-id:
+    description: 'iceDQ Org ID'
+    required: true
+  account-id:
+    description: 'iceDQ Account ID'
+    required: true
+  workspace-id:
+    description: 'Target workspace ID'
+    required: true
+  bundle:
+    description: 'Path to the export bundle ZIP (output of iceDQ Export action)'
+    required: true
+  output-file:
+    description: 'Path to write the generated mapping JSON'
+    required: false
+    default: 'icedq-mapping.json'
+  cli-version:
+    description: 'Pin a specific @icedq/cli version (default: latest)'
+    required: false
+    default: 'latest'
+  verify-ssl:
+    description: 'Verify TLS (default true)'
+    required: false
+    default: 'true'
+  upload-artifact:
+    description: 'Upload the mapping file as a workflow artifact'
+    required: false
+    default: 'true'
+  artifact-name:
+    description: 'Name of the uploaded artifact'
+    required: false
+    default: 'icedq-mapping'
+
+outputs:
+  mapping-file:
+    description: 'Path to the generated mapping JSON file'
+    value: ${{ steps.run-generate-mapping.outputs.mapping-file }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+
+    - name: Install @icedq/cli
+      shell: bash
+      run: npm install -g "@icedq/cli@${{ inputs.cli-version }}"
+
+    - name: Run icedq generate-mapping
+      id: run-generate-mapping
+      shell: bash
+      env:
+        ICEDQ_URL: ${{ inputs.icedq-url }}
+        ICEDQ_KEYCLOAK_URL: ${{ inputs.keycloak-url }}
+        ICEDQ_CLIENT_ID: ${{ inputs.client-id }}
+        ICEDQ_CLIENT_SECRET: ${{ inputs.client-secret }}
+        ICEDQ_ORG_ID: ${{ inputs.org-id }}
+        ICEDQ_ACCOUNT_ID: ${{ inputs.account-id }}
+        ICEDQ_WORKSPACE_ID: ${{ inputs.workspace-id }}
+        ICEDQ_VERIFY_SSL: ${{ inputs.verify-ssl }}
+        BUNDLE: ${{ inputs.bundle }}
+        OUTPUT_FILE: ${{ inputs.output-file }}
+      run: bash "${{ github.action_path }}/scripts/run-generate-mapping.sh"
+
+    - name: Upload mapping artifact
+      if: ${{ inputs.upload-artifact == 'true' && steps.run-generate-mapping.outputs.mapping-file != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.output-file }}
+        if-no-files-found: error
