@@ -2,7 +2,7 @@
 
 GitHub composite Action that auto-generates a mapping file from an iceDQ export bundle by invoking [`@icedq/cli`](https://www.npmjs.com/package/@icedq/cli).
 
-Pairs with [`icedq-tools/export-action`](https://github.com/icedq-tools/export-action) and [`icedq-tools/import-action`](https://github.com/icedq-tools/import-action) for zero-touch promotion pipelines.
+Pairs with [`icedq-tools/export-action`](https://github.com/marketplace/actions/icedq-export) and [`icedq-tools/import-action`](https://github.com/marketplace/actions/icedq-import) for zero-touch promotion pipelines.
 
 ## Usage
 
@@ -180,4 +180,4 @@ For iceDQ instances on private networks, set `runs-on: [self-hosted, icedq]` (or
 
 - [`icedq-tools/cli`](https://www.npmjs.com/package/@icedq/cli) — the CLI this Action wraps
 - [`icedq-tools/export-action`](https://github.com/marketplace/actions/icedq-export) — exports a bundle from the source workspace
-- [`icedq-tools/import-action`](https://github.com/icedq-tools/import-action) — imports the bundle into the target workspace
+- [`icedq-tools/import-action`](https://github.com/marketplace/actions/icedq-import) — imports the bundle into the target workspace
